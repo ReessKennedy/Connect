@@ -4,31 +4,31 @@
  *
  * @param string $method The HTTP method (GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD).
  * @param string $url The base URL of the API endpoint.
- * @param array $data (optional) The data to send in the body of the request.
+ * @param array|string $data (optional) The data to send in the body of the request.
+ *                           Can be an array or a JSON-encoded string.
  * @param array $headers (optional) An associative array of headers.
  * @return array An array containing the response data and HTTP status code.
  */
-function sendHttpRequest(string $method, string $url, array $data = [], array $headers = []): array {
+function sendHttpRequest(string $method, string $url, $data = null, array $headers = []): array {
     // Initialize cURL session
     $ch = curl_init();
 
-    // Encode data as JSON if sending data
-    if (!empty($data) && in_array($method, ['POST', 'PUT', 'PATCH'])) {
+    // Encode data as JSON if sending data and $data is an array
+    if (!empty($data) && is_array($data) && in_array($method, ['POST', 'PUT', 'PATCH'])) {
         $jsonData = json_encode($data);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+    } elseif (!empty($data) && is_string($data)) {
+        // Set raw data if $data is already a JSON-encoded string
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     }
 
     // Set cURL options
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    // Set headers if provided
-    $formattedHeaders = [];
-    foreach ($headers as $key => $value) {
-        $formattedHeaders[] = "$key: $value";
-    }
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $formattedHeaders);
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $url,
+        CURLOPT_CUSTOMREQUEST => $method,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => $headers,
+    ]);
 
     // Execute cURL request
     $response = curl_exec($ch);
