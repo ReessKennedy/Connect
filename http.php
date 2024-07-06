@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Send an HTTP request to an API endpoint.
  *
  * @param string $method The HTTP method (GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD).
  * @param string $url The base URL of the API endpoint.
- * @param array|string $data (optional) The data to send in the body of the request.
- *                           Can be an array or a JSON-encoded string.
+ * @param array|string|null $data (optional) The data to send in the body of the request.
+ *                               Can be an array, JSON-encoded string, or null.
  * @param array $headers (optional) An associative array of headers.
  * @return array An array containing the response data and HTTP status code.
  */
@@ -13,13 +14,14 @@ function sendHttpRequest(string $method, string $url, $data = null, array $heade
     // Initialize cURL session
     $ch = curl_init();
 
-    // Encode data as JSON if sending data and $data is an array
-    if (!empty($data) && is_array($data) && in_array($method, ['POST', 'PUT', 'PATCH'])) {
-        $jsonData = json_encode($data);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-    } elseif (!empty($data) && is_string($data)) {
-        // Set raw data if $data is already a JSON-encoded string
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    // Encode data as JSON if sending data and $data is an array or JSON string
+    if (!is_null($data)) {
+        if (is_array($data)) {
+            $jsonData = json_encode($data);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+        } elseif (is_string($data)) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        }
     }
 
     // Set cURL options
