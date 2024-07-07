@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Send an HTTP request to an API endpoint.
  *
