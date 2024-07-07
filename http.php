@@ -6,11 +6,11 @@
  * @param string $url The base URL of the API endpoint.
  * @param array|string|null $data (optional) The data to send in the body of the request.
  *                               Can be an array, JSON-encoded string, or null.
- * @param array $headers (optional) An associative array of headers.
+ * @param array $headers (optional) An associative array or indexed array of headers.
  * @param int $timeout (optional) The maximum number of seconds to allow cURL functions to execute.
  * @return array An array containing the response data and HTTP status code.
  */
-function sendHttpRequest(string $method, string $url, $data = null, array $headers = [], int $timeout = 30): array {
+function sendHttpRequest(string $method, string $url, $data = null, $headers = [], int $timeout = 30): array {
     // Initialize cURL session
     $ch = curl_init();
 
@@ -19,10 +19,23 @@ function sendHttpRequest(string $method, string $url, $data = null, array $heade
         if (is_array($data)) {
             $jsonData = json_encode($data);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-            $headers[] = 'Content-Type: application/json';
+            // If headers are associative, add Content-Type header
+            if (is_array($headers) && !isset($headers[0])) {
+                $headers['Content-Type'] = 'application/json';
+            }
         } elseif (is_string($data)) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         }
+    }
+
+    // Convert headers to the appropriate format if they are associative
+    if (is_array($headers) && !isset($headers[0])) {
+        $curlHeaders = [];
+        foreach ($headers as $key => $value) {
+            $curlHeaders[] = "$key: $value";
+        }
+    } else {
+        $curlHeaders = $headers;
     }
 
     // Set cURL options
@@ -30,7 +43,7 @@ function sendHttpRequest(string $method, string $url, $data = null, array $heade
         CURLOPT_URL => $url,
         CURLOPT_CUSTOMREQUEST => $method,
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => $headers,
+        CURLOPT_HTTPHEADER => $curlHeaders,
         CURLOPT_TIMEOUT => $timeout,
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
