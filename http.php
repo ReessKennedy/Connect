@@ -1,36 +1,34 @@
-<?php
-
+<?php 
 /**
  * Send an HTTP request to an API endpoint.
  *
  * @param string $method The HTTP method (GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD).
  * @param string $url The base URL of the API endpoint.
- * @param array|string|null $data (optional) The data to send in the body of the request.
- *                               Can be an array, JSON-encoded string, or null.
+ * @param array $data (optional) The data to send in the body of the request.
  * @param array $headers (optional) An associative array of headers.
  * @return array An array containing the response data and HTTP status code.
  */
-function sendHttpRequest(string $method, string $url, $data = null, array $headers = []): array {
+function sendHttpRequest(string $method, string $url, array $data = [], array $headers = []): array {
     // Initialize cURL session
     $ch = curl_init();
 
-    // Encode data as JSON if sending data and $data is an array or JSON string
-    if (!is_null($data)) {
-        if (is_array($data)) {
-            $jsonData = json_encode($data);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-        } elseif (is_string($data)) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        }
+    // Encode data as JSON if sending data
+    if (!empty($data) && in_array($method, ['POST', 'PUT', 'PATCH'])) {
+        $jsonData = json_encode($data);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
     }
 
     // Set cURL options
-    curl_setopt_array($ch, [
-        CURLOPT_URL => $url,
-        CURLOPT_CUSTOMREQUEST => $method,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => $headers,
-    ]);
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    // Set headers if provided
+    $formattedHeaders = [];
+    foreach ($headers as $key => $value) {
+        $formattedHeaders[] = "$key: $value";
+    }
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $formattedHeaders);
 
     // Execute cURL request
     $response = curl_exec($ch);
