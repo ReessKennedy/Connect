@@ -4,31 +4,37 @@
  *
  * @param string $method The HTTP method (GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD).
  * @param string $url The base URL of the API endpoint.
- * @param array $data (optional) The data to send in the body of the request.
+ * @param array|string|null $data (optional) The data to send in the body of the request.
+ *                               Can be an array, JSON-encoded string, or null.
  * @param array $headers (optional) An associative array of headers.
+ * @param int $timeout (optional) The maximum number of seconds to allow cURL functions to execute.
  * @return array An array containing the response data and HTTP status code.
  */
-function sendHttpRequest(string $method, string $url, array $data = [], array $headers = []): array {
+function sendHttpRequest(string $method, string $url, $data = null, array $headers = [], int $timeout = 30): array {
     // Initialize cURL session
     $ch = curl_init();
 
-    // Encode data as JSON if sending data
-    if (!empty($data) && in_array($method, ['POST', 'PUT', 'PATCH'])) {
-        $jsonData = json_encode($data);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+    // Encode data as JSON if sending data and $data is an array or JSON string
+    if (!is_null($data)) {
+        if (is_array($data)) {
+            $jsonData = json_encode($data);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+            $headers[] = 'Content-Type: application/json';
+        } elseif (is_string($data)) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        }
     }
 
     // Set cURL options
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    // Set headers if provided
-    $formattedHeaders = [];
-    foreach ($headers as $key => $value) {
-        $formattedHeaders[] = "$key: $value";
-    }
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $formattedHeaders);
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $url,
+        CURLOPT_CUSTOMREQUEST => $method,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => $headers,
+        CURLOPT_TIMEOUT => $timeout,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+    ]);
 
     // Execute cURL request
     $response = curl_exec($ch);
