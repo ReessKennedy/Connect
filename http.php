@@ -1,5 +1,4 @@
 <?php
-<?php
 /**
  * Send an HTTP request to an API endpoint.
  *
@@ -87,5 +86,3 @@ function sendHttpRequest(string $method, string $url, $data = null, $headers = [
     ];
 }
 
-
-?>
