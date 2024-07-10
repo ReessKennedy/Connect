@@ -1,4 +1,5 @@
 <?php
+<?php
 /**
  * Send an HTTP request to an API endpoint.
  *
@@ -17,11 +18,16 @@ function sendHttpRequest(string $method, string $url, $data = null, $headers = [
     // Encode data as JSON if sending data and $data is an array or JSON string
     if (!is_null($data)) {
         if (is_array($data)) {
-            $jsonData = json_encode($data);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-            // If headers are associative, add Content-Type header
-            if (is_array($headers) && !isset($headers[0])) {
-                $headers['Content-Type'] = 'application/json';
+            if ($method === 'GET') {
+                // Append query parameters to URL for GET requests
+                $url .= '?' . http_build_query($data);
+            } else {
+                $jsonData = json_encode($data);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                // If headers are associative, add Content-Type header
+                if (is_array($headers) && !isset($headers[0])) {
+                    $headers['Content-Type'] = 'application/json';
+                }
             }
         } elseif (is_string($data)) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
@@ -80,3 +86,6 @@ function sendHttpRequest(string $method, string $url, $data = null, $headers = [
         'http_code' => $httpCode
     ];
 }
+
+
+?>
