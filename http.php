@@ -18,8 +18,9 @@ function sendHttpRequest(string $method, string $url, $data = null, $headers = [
     if (!is_null($data)) {
         if (is_array($data)) {
             if ($method === 'GET') {
-                // Append query parameters to URL for GET requests
-                $url .= '?' . http_build_query($data);
+                // Check if URL already has query parameters
+                $querySeparator = strpos($url, '?') === false ? '?' : '&';
+                $url .= $querySeparator . http_build_query($data);
             } else {
                 $jsonData = json_encode($data);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
@@ -85,4 +86,3 @@ function sendHttpRequest(string $method, string $url, $data = null, $headers = [
         'http_code' => $httpCode
     ];
 }
-
