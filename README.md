@@ -16,3 +16,19 @@ Send and received info via http requests.
 |HEAD|Retrieves the headers for the specified resource, similar to `GET`, but without the response body.|The function sets the HTTP method to `HEAD` and handles the request without sending any data in the body.|
 
 ## Resources 🌐
+Despite this, for serious http communication in php it's likely better to use something like Guzzle or one of many libraries ... 
+
+|Rank|Library|Description|GitHub Stars|Documentation URL|
+|---|---|---|---|---|
+|1|Guzzle|A PHP HTTP client that makes it easy to send HTTP requests and trivial to integrate with web services.|23.8k|[https://docs.guzzlephp.org/en/stable/](https://docs.guzzlephp.org/en/stable/)|
+|2|cURL|A popular library that allows you to connect and communicate to many different types of servers.|Built-in|[https://www.php.net/manual/en/book.curl.php](https://www.php.net/manual/en/book.curl.php)|
+|3|Symfony HTTP Client|A component of the Symfony framework, it provides powerful tools to make HTTP requests.|2.5k|https://symfony.com/doc/current/http_client.html|
+|4|Requests|A simple HTTP library written in PHP, for PHP. It provides a consistent API for sending HTTP requests.|2.1k|https://requests.ryanmccue.info/|
+|5|Buzz|A lightweight PHP library for issuing HTTP requests.|1.2k|[https://github.com/kriswallsmith/Buzz](https://github.com/kriswallsmith/Buzz)|
+|6|HTTPful|A simple and chainable library for making HTTP requests.|900|[http://phphttpclient.com/](http://phphttpclient.com/)|
+|7|Httplug|An HTTP client abstraction for PHP to provide unified interfaces for HTTP clients.|700|[http://httplug.io/](http://httplug.io/)|
+|8|Zend Diactoros|A PSR-7 HTTP message implementation by Zend Framework, used to create and manipulate HTTP messages.|600|https://docs.zendframework.com/zend-diactoros/|
+|9|Unirest|Simplifies making HTTP REST requests, even simpler than cURL.|500|http://unirest.io/php.html|
+|10|ReactPHP HTTP|An async library for HTTP requests with ReactPHP.|400|https://reactphp.org/http/|
+
+
